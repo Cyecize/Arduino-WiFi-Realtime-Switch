@@ -8,6 +8,17 @@ SoftwareSerial wifiSerial(General::WIFI_RX_PIN, General::WIFI_TX_PIN); // RX, TX
 WiFiClient wifiClient;
 WebSocketClient socketClient;
 
+void waitForWifi() {
+    // waiting for connection to Wi-Fi network
+    Serial.println("Waiting for connection to Wi-Fi");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print('.');
+    }
+    Serial.println();
+    Serial.println("Connected to WiFi network.");
+}
+
 void setup() {
 // write your initialization code here
     Serial.begin(General::SERIAL_BAUD_RATE);
@@ -25,14 +36,7 @@ void setup() {
         while (true);
     }
 
-    // waiting for connection to Wi-Fi network
-    Serial.println("Waiting for connection to WiFi");
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        Serial.print('.');
-    }
-    Serial.println();
-    Serial.println("Connected to WiFi network.");
+    waitForWifi();
 
     socketClient.init(
             wifiClient,
@@ -48,5 +52,12 @@ void setup() {
 }
 
 void loop() {
-   socketClient.tick();
+    if (!socketClient.tick()) {
+        if (WiFi.status() != WL_CONNECTED) {
+            Serial.println("Wi-Fi connection was lost!");
+            waitForWifi();
+        }
+
+        socketClient.forceConnect();
+    }
 }

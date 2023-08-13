@@ -34,21 +34,21 @@ public:
         this->forceConnect();
     };
 
-    void tick() {
+    bool tick() {
         if (!client.connected()) {
             client.stop();
-            Serial.println("Connection with server ended, retrying connection.");
+            Serial.println("Connection with server ended unexpectedly.");
 
-            // do nothing forevermore
-            this->forceConnect();
+            return false;
         }
 
         if (client.available()) {
             readWebSocketData();
         }
+
+        return true;
     }
 
-private:
     void forceConnect() {
         int count = 1;
         Serial.println("Connecting to server socket!");
@@ -64,6 +64,7 @@ private:
         }
     }
 
+private:
     bool connect() {
         if (!client.connect(server, 4200)) {
             return false;
