@@ -30,4 +30,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/conn/WebSocketClient.h src/constants/General.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/conn/WebSocketClient.h src/constants/General.h src/execution/CommandExecutor.h src/execution/CommandType.h lib/base64/base64.h)

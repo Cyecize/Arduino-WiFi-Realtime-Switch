@@ -3,10 +3,12 @@
 #include <SoftwareSerial.h>
 #include "constants/General.h"
 #include "conn/WebSocketClient.h"
+#include "execution/CommandExecutor.h"
 
 SoftwareSerial wifiSerial(General::WIFI_RX_PIN, General::WIFI_TX_PIN); // RX, TX
 WiFiClient wifiClient;
 WebSocketClient socketClient;
+CommandExecutor executor;
 
 void waitForWifi() {
     // waiting for connection to Wi-Fi network
@@ -23,7 +25,7 @@ void setup() {
 // write your initialization code here
     Serial.begin(General::SERIAL_BAUD_RATE);
 
-    pinMode(General::SWITCH_PIN, OUTPUT);
+    executor.init();
     while (!Serial);
 
     wifiSerial.begin(General::WIFI_BAUD_RATE);
@@ -44,20 +46,23 @@ void setup() {
             General::SERVER_PORT,
             General::SOCKET_URL,
             [](char *val) {
-                Serial.print("I got ");
-                Serial.println(*val);
+                executor.execute(val);
             }
     );
-
 }
 
 void loop() {
     if (!socketClient.tick()) {
-        if (WiFi.status() != WL_CONNECTED) {
-            Serial.println("Wi-Fi connection was lost!");
-            waitForWifi();
-        }
+        //If the current task is timeout, finish it first, then fix the connection.
+        if (executor.currentCommand() != TIMEOUT) {
+            if (WiFi.status() != WL_CONNECTED) {
+                Serial.println("Wi-Fi connection was lost!");
+                waitForWifi();
+            }
 
-        socketClient.forceConnect();
+            socketClient.forceConnect();
+        }
     }
+
+    executor.tick();
 }

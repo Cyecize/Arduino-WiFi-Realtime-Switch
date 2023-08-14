@@ -12,6 +12,7 @@ public:
     static const int WIFI_BAUD_RATE = 9600;
     static const int WIFI_RX_PIN = 6;
     static const int WIFI_TX_PIN = 7;
+    static const int MAX_ALLOWED_TIMEOUT_SECONDS = 60;
 };
 
 const char *General::SERVER_NAME = "cyecize.com";
