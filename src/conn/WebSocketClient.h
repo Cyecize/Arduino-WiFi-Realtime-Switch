@@ -197,6 +197,9 @@ private:
         }
 
         this->callback(MSG_RESP_BUFFER);
+
+        // Reset the buffer.
+        memset(MSG_RESP_BUFFER, 0, MAX_MESSAGE_SIZE_BYTES);
     }
 };
 
