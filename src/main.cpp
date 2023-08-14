@@ -13,9 +13,15 @@ CommandExecutor executor;
 void waitForWifi() {
     // waiting for connection to Wi-Fi network
     Serial.println("Waiting for connection to Wi-Fi");
+    int c = 0;
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.print('.');
+        c++;
+
+        if (c >= 30) {
+            Serial.println();
+        }
     }
     Serial.println();
     Serial.println("Connected to WiFi network.");
@@ -31,11 +37,10 @@ void setup() {
     wifiSerial.begin(General::WIFI_BAUD_RATE);
     WiFi.init(wifiSerial);
 
-    if (WiFi.status() == WL_NO_MODULE) {
+    while (WiFi.status() == WL_NO_MODULE) {
         Serial.println();
-        Serial.println("Communication with WiFi module failed!");
-        // don't continue
-        while (true);
+        Serial.println("Communication with WiFi module failed, retrying indefinitely!");
+        delay(1000);
     }
 
     waitForWifi();
@@ -45,9 +50,7 @@ void setup() {
             General::SERVER_NAME,
             General::SERVER_PORT,
             General::SOCKET_URL,
-            [](char *val) {
-                executor.execute(val);
-            }
+            [](char *val) {executor.execute(val);}
     );
 }
 
