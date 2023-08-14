@@ -2,6 +2,7 @@
 #define ARDUINO_WIFI_REALTIME_SWITCH_WEBSOCKETCLIENT_H
 
 #include <WiFiEspAT.h>
+#include "../lib/base64/base64.h"
 
 typedef void (*CallbackFunction)(char *);
 
@@ -87,7 +88,11 @@ private:
 
         client.println("Connection: Upgrade");
         client.println("Upgrade: websocket");
-        client.println("Sec-WebSocket-Key: 6NxGIY+lXqyHTU0ak4HdlA==");
+
+        // Websocket Key header
+        client.print("Sec-WebSocket-Key: ");
+        client.println(generateWebSocketKey());
+
         client.println("Sec-WebSocket-Version: 13");
         client.println();
         client.flush();
@@ -95,6 +100,20 @@ private:
         readHTTPResponseHeaders();
 
         return true;
+    }
+
+    static String generateWebSocketKey() {
+        unsigned char randomBytes[16];
+        unsigned char key[17];
+        for (unsigned char &randomByte: randomBytes) {
+            randomByte = random(256); // Generate a random byte
+        }
+
+        // Encode randomBytes using base64
+        size_t encodedLength = encode_base64(randomBytes, 17, key);
+        key[encodedLength] = '\0'; // Null-terminate the string
+
+        return {reinterpret_cast<char *>(key)};
     }
 
     void readHTTPResponseHeaders() {
