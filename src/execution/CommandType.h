@@ -7,10 +7,6 @@
     X(OFF, "2", handleOff) \
     X(TIMEOUT, "3", handleTimeout)
 
-// Initialize handlers
-//OnOffHandler switchHandler = OnOffHandler();
-//TimeoutHandler timeoutHandler = TimeoutHandler();
-
 class BaseCommandHandler {
 public:
     virtual bool init(String &params) { return true; }
@@ -83,21 +79,13 @@ OnOffHandler offHandler = OnOffHandler(0);
 TimeoutHandler timeoutHandler = TimeoutHandler();
 
 // Define function prototypes for handlers
-BaseCommandHandler &handleNone() {
-    return noneHandler;
-}
+BaseCommandHandler &handleNone() { return noneHandler; }
 
-BaseCommandHandler &handleOn() {
-    return onHandler;
-}
+BaseCommandHandler &handleOn() { return onHandler; }
 
-BaseCommandHandler &handleOff() {
-    return offHandler;
-}
+BaseCommandHandler &handleOff() { return offHandler; }
 
-BaseCommandHandler &handleTimeout() {
-    return timeoutHandler;
-}
+BaseCommandHandler &handleTimeout() { return timeoutHandler; }
 
 // Define the handler function pointers
 typedef BaseCommandHandler &(*CommandHandler)();
