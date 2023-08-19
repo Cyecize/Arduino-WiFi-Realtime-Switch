@@ -43,12 +43,12 @@ public:
     bool init(String &params) override {
         // Eg. params: "<c>3</c><to>15</to>"
         long time = params.substring(params.indexOf("<to>") + 4, params.indexOf("</to>")).toInt();
-        Serial.println(time);
         if (time <= 0 || time > General::MAX_ALLOWED_TIMEOUT_SECONDS) {
             Serial.println("Invalid timeout value in command: " + params + "!");
             return false;
         }
 
+        Serial.println("Setting timeout for " + String(time) + " seconds.");
         this->expectedDiff = time * 1000;
         this->millisStart = millis();
 

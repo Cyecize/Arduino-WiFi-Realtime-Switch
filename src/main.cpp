@@ -4,11 +4,15 @@
 #include "constants/General.h"
 #include "conn/WebSocketClient.h"
 #include "execution/CommandExecutor.h"
+#include "util/MemoryMonitor.h"
+#include "util/TaskScheduler.h"
 
 SoftwareSerial wifiSerial(General::WIFI_RX_PIN, General::WIFI_TX_PIN); // RX, TX
 WiFiClient wifiClient;
 WebSocketClient socketClient;
 CommandExecutor executor;
+MemoryMonitor memoryMonitor = MemoryMonitor();
+TaskScheduler sockRestartScheduler;
 
 void waitForWifi() {
     // waiting for connection to Wi-Fi network
@@ -50,11 +54,23 @@ void setup() {
             General::SERVER_NAME,
             General::SERVER_PORT,
             General::SOCKET_URL,
-            [](char *val) {executor.execute(val);}
+            [](char *val) { executor.execute(val); }
     );
+
+    sockRestartScheduler.init(
+            General::SOCKET_RESTART_INTERVAL_MILLIS,
+            true,
+            []() { socketClient.restartConnection(); }
+
+    );
+
+    memoryMonitor.init();
 }
 
 void loop() {
+    memoryMonitor.tick();
+    sockRestartScheduler.tick();
+
     if (!socketClient.tick()) {
         //If the current task is timeout, finish it first, then fix the connection.
         if (executor.currentCommand() != TIMEOUT) {
@@ -64,6 +80,7 @@ void loop() {
             }
 
             socketClient.forceConnect();
+            sockRestartScheduler.reset();
         }
     }
 

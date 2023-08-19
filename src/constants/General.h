@@ -13,6 +13,8 @@ public:
     static const int WIFI_RX_PIN = 6;
     static const int WIFI_TX_PIN = 7;
     static const int MAX_ALLOWED_TIMEOUT_SECONDS = 60;
+    static const long MEMORY_MONITOR_INTERVAL_MILLIS = 300000;
+    static const long SOCKET_RESTART_INTERVAL_MILLIS = 3600000;
 };
 
 const char *General::SERVER_NAME = "cyecize.com";

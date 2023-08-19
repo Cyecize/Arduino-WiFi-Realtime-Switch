@@ -65,6 +65,12 @@ public:
         }
     }
 
+    void restartConnection() {
+        Serial.println("Scheduled restart of socket connection.");
+        this->client.stop();
+        this->forceConnect();
+    }
+
 private:
     bool connect() {
         if (!client.connect(server, 4200)) {
